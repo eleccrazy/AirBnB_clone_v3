@@ -25,6 +25,9 @@ def city_place_without_id(city_id=None):
             abort(400, "Not a Json")
         if data.get("user_id") is None:
             abort(400, "Missing user_id")
+        user = storage.get(User, data.get("user_id"))
+        if user is None:
+            abort(404)
         if data.get("name") is None:
             abort(400, "Missing name")
         data['city_id'] = city_id
