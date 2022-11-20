@@ -18,7 +18,8 @@ def page_not_found(error):
 @app.errorhandler(400)
 def bad_request(error):
     d = error.description
-    msgs = ["Missing name", "Missing email", "Missing password"]
+    msgs = ["Missing name", "Missing email",
+            "Missing password", "Missing user_id"]
     message = 'Not a Json' if d not in msgs else d
     return make_response(jsonify({'error': message}), 400)
 
