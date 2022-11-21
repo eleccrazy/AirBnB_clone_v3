@@ -15,7 +15,7 @@ def place_review_without_id(place_id=None):
     if place is None:
         abort(404)
     if request.method == 'GET':
-        objs = storage.all('Place')
+        objs = storage.all('Review')
         obj_list = [obj.to_dict() for obj in objs.values()
                     if obj.place_id == place_id]
         return jsonify(obj_list)
