@@ -4,8 +4,8 @@ from api.v1.views import app_views
 from flask import jsonify, request, abort
 from models import storage
 from models.place import Place
-from models.city import City
 from models.user import User
+from models.review import Review
 
 
 @app_views.route('/places/<place_id>/reviews', methods=['GET', 'POST'])
@@ -24,8 +24,6 @@ def place_review_without_id(place_id=None):
         data = request.get_json()
         if data is None:
             abort(400, "Not a Json")
-        if data.get("name") is None:
-            abort(400, "Missing name")
         if data.get("user_id") is None:
             abort(400, "Missing user_id")
         user = storage.get(User, data.get("user_id"))
