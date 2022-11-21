@@ -6,6 +6,7 @@ from models import storage
 from models.city import City
 from models.place import Place
 from models.amenity import Amenity
+from models.user import User
 from os import getenv
 
 
@@ -43,7 +44,7 @@ def city_place_with_id(place_id=None):
     """Handles http request for places route with id"""
     obj = storage.get(Place, place_id)
     if obj is None:
-        abort(404, "Not found")
+        abort(404)
     if request.method == 'GET':
         return jsonify(obj.to_dict())
 
@@ -67,15 +68,14 @@ def city_place_with_id(place_id=None):
 @app_views.route('/places_search', methods=['POST'])
 def search_place():
     """Handles http POST request for searching places depending on some data"""
+    all_places = [p for p in storage.all('Place').values()]
     data = request.get_json()
-    places = storage.all('Place')
-    places = [o for o in places.values()]
     if data is None:
         abort(400)
     states = data.get('states')
     if states and len(states) > 0:
-        cities = storage.all('City')
-        state_cities = set([city.id for city in cities.values()
+        all_cities = storage.all('City')
+        state_cities = set([city.id for city in all_cities.values()
                             if city.state_id in states])
     else:
         state_cities = set()
@@ -86,23 +86,23 @@ def search_place():
         state_cities = state_cities.union(cities)
     amenities = data.get('amenities')
     if len(state_cities) > 0:
-        places = [p for p in places if p.city_id in state_cities]
+        all_places = [p for p in all_places if p.city_id in state_cities]
     elif amenities is None or len(amenities) == 0:
-        result = [place.to_dict() for place in places]
+        result = [place.to_dict() for place in all_places]
         return jsonify(result)
     places_amenities = []
     if amenities and len(amenities) > 0:
         amenities = set([
             a_id for a_id in amenities if storage.get(Amenity, a_id)])
-        for p in places:
+        for p in all_places:
             p_amenities = None
-            if getenv("HBNB_TYPE_STORAGE", None) == "db" and p.amenities:
+            if STORAGE_TYPE == 'db' and p.amenities:
                 p_amenities = [a.id for a in p.amenities]
             elif len(p.amenities) > 0:
                 p_amenities = p.amenities
             if p_amenities and all([a in p_amenities for a in amenities]):
                 places_amenities.append(p)
     else:
-        places_amenities = places
+        places_amenities = all_places
     result = [place.to_dict() for place in places_amenities]
     return jsonify(result)
