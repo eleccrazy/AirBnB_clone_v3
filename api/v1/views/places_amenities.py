@@ -24,7 +24,7 @@ def place_amenities(place_id=None):
         for id in place_amen_ids:
             place_amenities.append(storage.get(Amenity, id))
     place_amenities = [
-        obj.to_json() for obj in place_amenities
+        obj.to_dict() for obj in place_amenities
         ]
     return jsonify(place_amenities)
 
@@ -54,9 +54,10 @@ def amenity_to_place(place_id=None, amenity_id=None):
     if request.method == 'POST':
         if (amenity in place.amenities or
                 amenity.id in place.amenities):
-            return jsonify(amenity.to_json()), 200
+            return jsonify(amenity.to_dict()), 200
         if environ.get('HBNB_TYPE_STORAGE') == 'db':
             place.amenities.append(amenity)
         else:
             place.amenities = amenity
-        return jsonify(amenity.to_json()), 201
+        place.save()
+        return jsonify(amenity.to_dict()), 201
