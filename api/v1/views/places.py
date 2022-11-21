@@ -1,40 +1,45 @@
 #!/usr/bin/python3
-"""Python file that works with api calls on city objects"""
+"""Python file that works with api calls on Place objects"""
 from api.v1.views import app_views
 from flask import jsonify, request, abort
 from models import storage
-from models.state import State
 from models.city import City
+from models.place import Place
 
 
-@app_views.route('/states/<state_id>/cities', methods=['GET', 'POST'])
-def state_city_without_id(state_id=None):
-    """Handles http request for cities route with no id provided"""
-    state = storage.get(State, state_id)
-    if state is None:
+@app_views.route('/cities/<city_id>/places', methods=['GET', 'POST'])
+def city_place_without_id(city_id=None):
+    """Handles http request for places route with no id provided"""
+    city = storage.get(City, city_id)
+    if city is None:
         abort(404)
     if request.method == 'GET':
-        objs = storage.all('City')
+        objs = storage.all('Place')
         obj_list = [obj.to_dict() for obj in objs.values()
-                    if obj.state_id == state_id]
+                    if obj.city_id == city_id]
         return jsonify(obj_list)
 
     if request.method == 'POST':
         data = request.get_json()
         if data is None:
             abort(400, "Not a Json")
+        if data.get("user_id") is None:
+            abort(400, "Missing user_id")
+        user = storage.get(User, data.get("user_id"))
+        if user is None:
+            abort(404)
         if data.get("name") is None:
             abort(400, "Missing name")
-        data['state_id'] = state_id
-        obj = City(**data)
+        data['city_id'] = city_id
+        obj = Place(**data)
         obj.save()
         return jsonify(obj.to_dict()), 201
 
 
-@app_views.route('/cities/<city_id>', methods=['GET', 'DELETE', 'PUT'])
-def state_city_with_id(city_id=None):
-    """Handles http request for cities route with id"""
-    obj = storage.get(City, city_id)
+@app_views.route('/places/<place_id>', methods=['GET', 'DELETE', 'PUT'])
+def city_place_with_id(place_id=None):
+    """Handles http request for places route with id"""
+    obj = storage.get(Place, place_id)
     if obj is None:
         abort(404, "Not found")
     if request.method == 'GET':
@@ -49,7 +54,7 @@ def state_city_with_id(city_id=None):
         data = request.get_json()
         if data is None:
             abort(400)
-        IGNORE = ['id', 'created_at', 'updated_at', 'state_id']
+        IGNORE = ['id', 'created_at', 'updated_at', 'city_id', 'user_id']
         d = {k: v for k, v in data.items() if k not in IGNORE}
         for k, v in d.items():
             setattr(obj, k, v)

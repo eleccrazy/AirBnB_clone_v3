@@ -36,7 +36,7 @@ def with_id(state_id=None):
     if request.method == 'DELETE':
         obj.delete()
         del obj
-        return jsonify({})
+        return jsonify({}), 200
 
     if request.method == 'PUT':
         data = request.get_json()
