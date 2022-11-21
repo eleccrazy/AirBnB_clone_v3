@@ -19,7 +19,8 @@ def page_not_found(error):
 def bad_request(error):
     d = error.description
     msgs = ["Missing name", "Missing email",
-            "Missing password", "Missing user_id"]
+            "Missing password", "Missing user_id",
+            "Missing text"]
     message = 'Not a Json' if d not in msgs else d
     return make_response(jsonify({'error': message}), 400)
 
