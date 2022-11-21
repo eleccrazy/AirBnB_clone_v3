@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" console """
+""" console. """
 
 import cmd
 from datetime import datetime
@@ -26,7 +26,7 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def emptyline(self):
-        """ overwriting the emptyline method """
+        """ overwriting the emptyline method. """
         return False
 
     def do_quit(self, arg):
