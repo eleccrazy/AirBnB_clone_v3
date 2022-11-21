@@ -3,7 +3,7 @@
 from api.v1.views import app_views
 from flask import jsonify, request, abort
 from models import storage
-from models.state import State
+from models.place import Place
 from models.city import City
 from models.user import User
 
@@ -40,7 +40,7 @@ def place_review_without_id(place_id=None):
 
 
 @app_views.route('/reviews/<review_id>', methods=['GET', 'DELETE', 'PUT'])
-def state_city_with_id(review_id=None):
+def place_review_with_id(review_id=None):
     """Handles http request for reviews route with id"""
     obj = storage.get(Review, review_id)
     if obj is None:
